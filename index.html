@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create GitHub repositories instantly by uploading your files. AI-powered GitHub repo maker.">
+  <title>RepoForge — Instant GitHub Repository Creator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+
+  <!-- Header -->
+  <header id="app-header">
+    <div class="header-inner">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="logo-text">Repo<span class="logo-accent">Forge</span></span>
+      </div>
+      <div class="header-status" id="connectionStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">Not Connected</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="app-main">
+    <!-- Step 1: Authentication -->
+    <section class="card auth-card" id="authSection">
+      <div class="card-header">
+        <div class="step-badge">1</div>
+        <div>
+          <h2>Connect to GitHub</h2>
+          <p class="card-subtitle">Enter your Personal Access Token to get started</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="input-group">
+          <label for="githubToken">Personal Access Token</label>
+          <div class="token-input-wrapper">
+            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+            <button class="btn-icon" id="toggleTokenVisibility" title="Toggle visibility">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <p class="input-hint">
+            Need a token? 
+            <a href="https://github.com/settings/tokens/new?scopes=repo&description=RepoForge" target="_blank" rel="noopener">
+              Create one here →
+            </a>
+            (select <code>repo</code> scope)
+          </p>
+        </div>
+        <button class="btn btn-primary" id="connectBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+          Connect to GitHub
+        </button>
+      </div>
+    </section>
+
+    <!-- Step 2: Repository Info (hidden initially) -->
+    <section class="card repo-card hidden" id="repoSection">
+      <div class="card-header">
+        <div class="step-badge">2</div>
+        <div>
+          <h2>Repository Details</h2>
+          <p class="card-subtitle">Configure your new repository</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="user-info" id="userInfo">
+          <img class="user-avatar" id="userAvatar" src="" alt="Avatar">
+          <div>
+            <span class="user-name" id="userName"></span>
+            <span class="user-login" id="userLogin"></span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="input-group">
+            <label for="repoName">Repository Name <span class="required">*</span></label>
+            <input type="text" id="repoName" placeholder="my-awesome-project" spellcheck="false">
+          </div>
+          <div class="input-group">
+            <label for="repoVisibility">Visibility</label>
+            <div class="toggle-group">
+              <button class="toggle-btn active" data-value="public" id="togglePublic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
+                  <path d="M2 12h20"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                Public
+              </button>
+              <button class="toggle-btn" data-value="private" id="togglePrivate">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Private
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="repoDescription">Description <span class="optional">(optional)</span></label>
+          <input type="text" id="repoDescription" placeholder="A brief description of your project">
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="initReadme">
+            <span class="checkbox-custom"></span>
+            Add a Custom README.md
+          </label>
+        </div>
+        
+        <div class="readme-editor-container hidden" id="readmeEditorContainer">
+          <textarea id="customReadme" class="editor-textarea" placeholder="# My Awesome Project\n\nWrite your markdown here..." spellcheck="false"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: File Upload (hidden initially) -->
+    <section class="card files-card hidden" id="filesSection">
+      <div class="card-header">
+        <div class="step-badge">3</div>
+        <div>
+          <h2>Import Your Files</h2>
+          <p class="card-subtitle">Drag & drop or browse to add files</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone-content">
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <p class="dropzone-title">Drop files & folders here</p>
+            <p class="dropzone-subtitle">or click to browse</p>
+            <div class="dropzone-buttons">
+              <button class="btn btn-secondary btn-sm" id="browseFilesBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                  <polyline points="13 2 13 9 20 9"/>
+                </svg>
+                Browse Files
+              </button>
+              <button class="btn btn-secondary btn-sm" id="browseFolderBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+                Browse Folder
+              </button>
+            </div>
+          </div>
+          <input type="file" id="fileInput" multiple hidden>
+          <input type="file" id="folderInput" webkitdirectory hidden>
+        </div>
+
+        <!-- File list -->
+        <div class="file-list-container hidden" id="fileListContainer">
+          <div class="file-list-header">
+            <span class="file-count" id="fileCount">0 files</span>
+            <div class="file-list-actions">
+              <button class="btn btn-ghost btn-sm" id="addMoreBtn">+ Add More</button>
+              <button class="btn btn-ghost btn-sm btn-danger" id="clearAllBtn">Clear All</button>
+            </div>
+          </div>
+          <div class="file-tree" id="fileTree"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 4: Publish Release (hidden initially) -->
+    <section class="card release-card hidden" id="releaseSection">
+      <div class="card-header">
+        <div class="step-badge">4</div>
+        <div>
+          <h2>Publish a Release</h2>
+          <p class="card-subtitle">Optional: Create a GitHub release immediately</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="checkbox-group mb-16">
+          <label class="checkbox-label">
+            <input type="checkbox" id="createRelease">
+            <span class="checkbox-custom"></span>
+            Publish a new release
+          </label>
+        </div>
+        
+        <div class="release-fields hidden" id="releaseFields">
+          <div class="form-grid">
+            <div class="input-group">
+              <label for="releaseTag">Tag Version <span class="required">*</span></label>
+              <input type="text" id="releaseTag" placeholder="v1.0.0" spellcheck="false">
+            </div>
+            <div class="input-group">
+              <label for="releaseTitle">Release Title <span class="required">*</span></label>
+              <input type="text" id="releaseTitle" placeholder="Initial Release">
+            </div>
+          </div>
+          <div class="input-group" style="margin-bottom: 0;">
+            <label for="releaseNotes">Release Notes</label>
+            <textarea id="releaseNotes" class="editor-textarea" placeholder="What's new in this release?"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Create button -->
+    <div class="create-section hidden" id="createSection">
+      <button class="btn btn-create" id="createRepoBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span>Create Repository</span>
+        <div class="btn-shimmer"></div>
+      </button>
+    </div>
+
+    <!-- Progress overlay -->
+    <div class="progress-overlay hidden" id="progressOverlay">
+      <div class="progress-card">
+        <div class="progress-spinner">
+          <svg viewBox="0 0 50 50" class="spinner-svg">
+            <circle cx="25" cy="25" r="20" fill="none" stroke-width="4"/>
+          </svg>
+        </div>
+        <h3 class="progress-title" id="progressTitle">Creating Repository...</h3>
+        <p class="progress-detail" id="progressDetail">Initializing...</p>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-log" id="progressLog"></div>
+      </div>
+    </div>
+
+    <!-- Success overlay -->
+    <div class="success-overlay hidden" id="successOverlay">
+      <div class="success-card">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="48" height="48">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <h3>Repository Created! 🎉</h3>
+        <p class="success-message" id="successMessage"></p>
+        <a class="btn btn-primary" id="viewRepoLink" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          View on GitHub
+        </a>
+        <button class="btn btn-secondary" id="createAnotherBtn">Create Another</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
